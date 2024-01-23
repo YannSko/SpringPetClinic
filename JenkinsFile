@@ -1,1 +1,40 @@
 
+pipeline{
+    agent{label 'master'}
+    tools{maven 'M3'}
+    stages{
+        stage('Checkout'){
+            steps{
+                git branch: 'main', url: 'https://github.com/YannSko/SpringPetClinic'
+            }
+        }
+        stage('Build'){
+            steps{
+                withMaven(maven:'M3'){
+                bat 'mvn compile'
+
+                }
+            }
+        }
+        stage('Test'){
+            steps{
+               script {
+
+                    bat 'mvn test -Dmaven.test.failure.ignore=true'
+                }
+            }
+        }
+
+        stage('Package'){
+            steps{
+                bat 'mvn package -Dmaven.test.failure.ignore=true'
+            }
+        }
+        stage('Deploy'){
+            steps{
+                bat 'java -jar C:/ProgramData/Jenkins/.jenkins/workspace/Pet_Clinic_Declarative_Pipeline/target/spring-petclinic-2.1.0.BUILD-SNAPSHOT.jar'
+            }
+        }
+    }
+
+}
